@@ -1,0 +1,22 @@
+<% if (title) { %>
+<h1><%= title %></h1>
+<% } else {
+  res.redirect('/')
+} %>
+
+<%- messages() %>
+
+<% if (errors) { %>
+  <ul class="notice">
+ <% errors.array().forEach(error => { %>
+   <li><%= error.msg %></li>
+<%  }) %>
+ </ul>
+<% } %>
+
+<form class="add-new-form" action="/inv/addClassification" method="post">
+    <label for="classification_name">New classification name:</label><br>
+    <input class="form-input" type="text" name="classification_name" autofocus required><br>
+    <span>(The new classification name cannot contain a space or any special characters.)</span><br>    
+    <input class="submitBtn" type="submit" value="Submit">
+</form>

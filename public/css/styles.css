@@ -4,6 +4,7 @@
 *:after {
   box-sizing: border-box;
 }
+
 /***** header ******/
 #top-header {
   padding: 4px;
@@ -99,6 +100,7 @@ h1 {
   height: 75px;
   padding: 6px;
 }
+
 /****** classification display ******/
 #inv-display {
   display: flex;
@@ -125,7 +127,7 @@ li.classification hr {
 li.classification div.namePrice{
   text-align: center;
 }
-.
+
 /****** vehicle display ******/
 #vehicle-display {
   display: grid;
@@ -157,14 +159,14 @@ nav a {
   text-decoration: none;
 }
 
-/****** login page and registration page ******/
-.login-form, .registration-form {
-  justify-content: space-around;
-  margin: 5px;  
-}
-#email, #password, #fname, #lname {
+/****** forms, including login, registration, addNewInventory, addClassification, and management view******/
+.form-input {
   min-height: 30px;
   border: 2px solid black;
+}
+.add-new-form {
+  justify-content: space-around;
+  margin: 5px; 
 }
 .submitBtn {
   justify-self: center;
@@ -174,6 +176,10 @@ nav a {
   margin: 5px;  
   padding: 6px;
 }
+
+/****** login page and registration page ******/
+
+
 
 /****** media queries ******/
 @media (min-width: 600px) {
@@ -192,9 +198,6 @@ nav a {
 }
 #vehicle-main-pic {
   margin: 1em;
-}
-.vehicle-pic {
-
 }
 .vehicle-details {
   margin: 1em;
