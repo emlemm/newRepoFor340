@@ -59,17 +59,13 @@ async function addNewInventory(inv_make,
       inv_model,
       inv_year, 
       inv_description,
-      inv_image, 
-      inv_thumbnail, 
       inv_price, 
       inv_miles, 
       inv_color, 
       classification_id) {
   let message = "";
-  let status;
   try {
     message = "Successfully added new vehicle into inventory.";
-    status = true;
     await pool.query(
       `INSERT INTO public.inventory (
       inv_make,
@@ -95,12 +91,58 @@ async function addNewInventory(inv_make,
       inv_color, 
       classification_id]
     )
-    return [message, status]
+    return message
   } catch (error) {
     message = "Failed to update inventory. Please check inputs and try again.";
-    status = false;
     console.error("addNewInventory " + error)
-    return [message, status]
+    return message
+  }
+};
+
+/* ***************************
+ *  Update Inventory Data
+ * ************************** */
+async function updateInventory(
+  inv_id,
+  inv_make,
+  inv_model,
+  inv_description,
+  inv_price,
+  inv_year,
+  inv_miles,
+  inv_color,
+  classification_id
+) {
+  try {
+    const sql =
+      `UPDATE public.inventory SET inv_make = $1, inv_model = $2, inv_description = $3, inv_image = $4, inv_thumbnail = $5, inv_price = $4, inv_year = $5, inv_miles = $6, inv_color = $7, classification_id = $8 WHERE inv_id = $9 RETURNING *`
+    const data = await pool.query(sql, [
+      inv_make,
+      inv_model,
+      inv_description,
+      inv_price,
+      inv_year,
+      inv_miles,
+      inv_color,
+      classification_id,
+      inv_id
+    ])
+    return data.rows[0]
+  } catch (error) {
+    console.error("model error: " + error)
+  }
+};
+
+/* ***************************
+ *  Delete Inventory Item
+ * ************************** */
+ async function deleteInventoryItem(inv_id) {
+  try {
+    const sql = 'DELETE FROM inventory WHERE inv_id = $1'
+    const data = await pool.query(sql, [inv_id])
+  return data
+  } catch (error) {
+    new Error("Delete Inventory Item Error")
   }
 }
 
@@ -109,5 +151,7 @@ module.exports = {
   getInventoryByClassificationId, 
   getVehicleDataById,
   addNewClassificationName,
-  addNewInventory
+  addNewInventory,
+  updateInventory,
+  deleteInventoryItem
 };

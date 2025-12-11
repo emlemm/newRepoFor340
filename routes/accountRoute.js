@@ -9,24 +9,23 @@ const regValidate = require('../utilities/account-validation');
 router.get("/login", utilities.handleErrors(accountCont.buildLogin));
 router.get("/register", utilities.handleErrors(accountCont.buildRegister));
 //POST 
-router.post(
-    "/register", 
-    regValidate.registationRules(),
-    regValidate.checkRegData,
-    utilities.handleErrors(accountCont.registerAccount)
+router.post("/register", 
+  regValidate.registationRules(),
+  regValidate.checkRegData,
+  utilities.handleErrors(accountCont.registerAccount)
 );
 
 // Process the login attempt
-router.post(
-  "/login",
+router.post("/login",
   regValidate.loginRules(),
   regValidate.checkLoginData,
   utilities.handleErrors(accountCont.accountLogin)
-)
+);
+
 // account managment view after successful login
 router.get("/", 
   utilities.checkLogin,
   utilities.handleErrors(accountCont.buildAccountManagement)
-)
+);
 
 module.exports = router;

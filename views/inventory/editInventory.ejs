@@ -1,0 +1,39 @@
+<% if (title) { %>
+<h1><%= title %></h1>
+<% } else {
+  res.redirect('/')
+} %>
+
+<%- messages() %>
+
+<% if (errors) { %>
+  <ul class="notice">
+ <% errors.array().forEach(error => { %>
+   <li><%= error.msg %></li>
+<%  }) %>
+ </ul>
+<% } %>
+
+<form id="updateForm" class="add-new-form" action="/inv/update" method="post">
+    <label for="inv_make">Vehicle Make:</label><br>
+    <input class="form-input" type="text" name="inv_make" autofocus required value="<%= locals.inv_make %>"><br>
+    <label for="inv_model">Vehicle Model:</label><br>
+    <input class="form-input" type="text" name="inv_model" required value="<%= locals.inv_model %>"><br>
+    <label for="inv_year">Vehicle Year</label><br>
+    <input class="form-input" type="number" name="inv_year" required value="<%= locals.inv_year %>"><br>
+    <label for="inv_description">Vehicle Description:</label><br>
+    <input class="form-input" type="text" name="inv_description" required value="<%= locals.inv_description %>"><br>
+    <label for="inv_price">Vehicle Price:</label><br>
+    <input class="form-input" type="number" name="inv_price" required value="<%= locals.inv_price %>"><br>
+    <label for="inv_miles">Total Miles:</label><br>
+    <input class="form-input" type="number" name="inv_miles" required value="<%= locals.inv_miles %>"><br>
+    <label for="inv_color">Vehicle Color:</label><br>
+    <input class="form-input" type="text" name="inv_color" required value="<%= locals.inv_color %>"><br>
+    <label for="classification_name">Classification:</label><br>
+    <%- grid %><br>
+    <input id="submitUpdate" class="submitBtn" disabled type="submit" name="submit" value="Update Vehicle">
+    <input type="hidden" name="inv_id"
+    <% if(locals.inv_id) { %> value="<%= locals.inv_id %>"
+    <% } %>>
+</form>
+<script src="/js/inv-update.js"></script>
