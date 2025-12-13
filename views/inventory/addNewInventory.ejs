@@ -16,20 +16,20 @@
 
 <form class="add-new-form" action="/inv/addNewInventory" method="post">
     <label for="inv_make">Vehicle Make:</label><br>
-    <input class="form-input" type="text" name="inv_make" autofocus required value="<%= locals.inv_make %>"><br>
+    <input id="inv_make" class="form-input" type="text" name="inv_make" autofocus required value="<%= locals.inv_make %>"><br>
     <label for="inv_model">Vehicle Model:</label><br>
-    <input class="form-input" type="text" name="inv_model" required value="<%= locals.inv_model %>"><br>
+    <input id="inv_model" class="form-input" type="text" name="inv_model" required value="<%= locals.inv_model %>"><br>
     <label for="inv_year">Vehicle Year</label><br>
-    <input class="form-input" type="number" name="inv_year" required value="<%= locals.inv_year %>"><br>
+    <input id="inv_year" class="form-input" type="number" name="inv_year" required value="<%= locals.inv_year %>"><br>
     <label for="inv_description">Vehicle Description:</label><br>
-    <input class="form-input" type="text" name="inv_description" required value="<%= locals.inv_description %>"><br>
+    <input id="inv_description" class="form-input" type="text" name="inv_description" required value="<%= locals.inv_description %>"><br>
     <label for="inv_price">Vehicle Price:</label><br>
-    <input class="form-input" type="number" name="inv_price" required value="<%= locals.inv_price %>"><br>
+    <input id="inv_price" class="form-input" type="number" name="inv_price" required value="<%= locals.inv_price %>"><br>
     <label for="inv_miles">Total Miles:</label><br>
-    <input class="form-input" type="number" name="inv_miles" required value="<%= locals.inv_miles %>"><br>
+    <input id="inv_miles" class="form-input" type="number" name="inv_miles" required value="<%= locals.inv_miles %>"><br>
     <label for="inv_color">Vehicle Color:</label><br>
-    <input class="form-input" type="text" name="inv_color" required value="<%= locals.inv_color %>"><br>
-    <label for="classification_name">Classification:</label><br>
+    <input id="inv_color" class="form-input" type="text" name="inv_color" required value="<%= locals.inv_color %>"><br>
+    <label for="classificationList">Classification:</label><br>
     <%- grid %><br>
     <input class="submitBtn" type="submit" value="Submit">
 </form>
