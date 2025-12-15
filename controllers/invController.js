@@ -269,10 +269,8 @@ invCont.processDeleteRequest = async function (req, res, next) {
     inv_year,
   } = req.body
   const itemName = `${inv_make} ${inv_model}`
-  console.log(inv_id)
   const deleteVehicle = await invModel.deleteInventoryItem(inv_id)
-  console.log(deleteVehicle)
-  console.log(deleteVehicle.typeof)
+  
   if (deleteVehicle) {
     req.flash("notice", `The ${itemName} was successfully deleted.`)
     const classificationSelect = await utilities.buildClassificationList() 

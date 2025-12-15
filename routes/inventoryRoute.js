@@ -13,31 +13,50 @@ router.get("/detail/:id", util.handleErrors(invController.buildByInventoryId));
 router.get("/error", util.handleErrors(invController.builtInError));
 
 // Route to inventory management views
-router.get("/management", util.handleErrors(invController.buildInvManagement));
-router.get("/addClassification", util.handleErrors(invController.buildAddClassification));
-router.get("/addNewInventory", util.handleErrors(invController.buildAddNewInventory));
-router.get("/getInventory/:classification_id", util.handleErrors(invController.getInventoryJSON));
+router.get("/management", 
+    util.checkLogin,
+    util.checkAccountType,
+    util.handleErrors(invController.buildInvManagement));
+router.get("/addClassification", 
+    util.checkAccountType,
+    util.handleErrors(invController.buildAddClassification));
+router.get("/addNewInventory",
+    util.checkAccountType,
+    util.handleErrors(invController.buildAddNewInventory));
+router.get("/getInventory/:classification_id", 
+    util.checkAccountType,
+    util.handleErrors(invController.getInventoryJSON));
 
 //process add new classification
 router.post("/addClassification", 
     validateInv.classificationRules(),
     validateInv.checkClassificationData,
+    util.checkAccountType,
     util.handleErrors(invController.processAddClassification));
 
 //process add new inventory
 router.post("/addNewInventory", 
     validateInv.inventoryRules(),
     validateInv.checkInventoryData,
+    util.checkAccountType,
     util.handleErrors(invController.processAddNewInventory));
 
 //process edit inventory views
-router.get("/edit/:inventoryId", util.handleErrors(invController.buildEditInventory));
+router.get("/edit/:inventoryId", 
+    util.checkAccountType,
+    util.handleErrors(invController.buildEditInventory));
 router.post("/update", 
     validateInv.inventoryRules(),
     validateInv.checkUpdateData,
     util.handleErrors(invController.updateInventory));
 
 //process delete inventory request
-router.get("/delete/:inventoryId", util.handleErrors(invController.buildDeleteView));
-router.post("/delete", util.handleErrors(invController.processDeleteRequest));
+router.get("/delete/:inventoryId", 
+    util.checkAccountType,
+    util.handleErrors(invController.buildDeleteView));
+router.post("/delete", 
+    util.checkAccountType,
+    util.handleErrors(invController.processDeleteRequest));
+
+
 module.exports = router;

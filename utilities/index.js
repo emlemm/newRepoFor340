@@ -124,21 +124,29 @@ Util.handleErrors = fn => (req, res, next) => Promise.resolve(fn(req, res, next)
 Util.checkJWTToken = (req, res, next) => {
  if (req.cookies.jwt) {
   jwt.verify(
-   req.cookies.jwt,
-   process.env.ACCESS_TOKEN_SECRET,
-   function (err, accountData) {
-    if (err) {
-     req.flash("Please log in")
-     res.clearCookie("jwt")
-     return res.redirect("/account/login")
-    }
-    res.locals.accountData = accountData
-    res.locals.loggedin = 1
+    req.cookies.jwt,
+    process.env.ACCESS_TOKEN_SECRET,
+    function (err, accountData) {
+      if (err) {
+        req.flash("Please log in")
+        res.clearCookie("jwt")
+        return res.redirect("/account/login")
+      }
+      res.locals.accountData = accountData
+      res.locals.loggedin = 1;
+      res.locals.firstName = accountData.account_firstname
+      res.locals.accountID = accountData.account_id
+
+      if (accountData.account_type == 'Admin' || accountData.account_type == 'Employee') {
+        res.locals.employeeOrAdmin = 1
+      } else {
+        res.locals.employeeOrAdmin = 0
+      } 
+      next()
+    } 
+  )} else {
     next()
-   })
- } else {
-  next()
- }
+  }
 };
 
 /* ****************************************
@@ -152,5 +160,17 @@ Util.checkJWTToken = (req, res, next) => {
     return res.redirect("/account/login")
   }
  };
+
+/* ****************************************
+* Check JWTToken for account type
+**************************************** */
+Util.checkAccountType = (req, res, next) => {
+  if (res.locals.employeeOrAdmin) {
+    next()
+  } else {
+    req.flash("notice", "Please log in as an employee or manager to access that page.")
+    return res.redirect("/account/login")
+  }
+};
 
 module.exports = Util

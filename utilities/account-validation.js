@@ -3,9 +3,9 @@ const { body, validationResult } = require("express-validator")
 const validate = {}
 const accountModel = require("../models/account-model");
 
-/*  **********************************
-*  Registration Data Validation Rules
-* ********************************* */
+/* **********************************
+ *  Registration Data Validation Rules
+ * ********************************* */
 validate.registationRules = () => {
   return [
     // firstname is required and must be string
@@ -38,7 +38,14 @@ validate.registationRules = () => {
         throw new Error("Email exists. Please log in or use different email")
       }
     }),
+  ]
+}
 
+/* **********************************
+ *  Password Validation Rules for Registration or Update Password
+ * ********************************* */
+validate.passwordRules = () => {
+  return [
     // password is required and must be strong password
     body("account_password")
       .trim()
@@ -54,8 +61,8 @@ validate.registationRules = () => {
   ]
 }
 
-  /* ******************************
- * Check data and return errors or continue to registration
+/* ******************************
+ * Check registration data and return errors or continue to registration
  * ***************************** */
 validate.checkRegData = async (req, res, next) => {
   const { account_firstname, account_lastname, account_email } = req.body
@@ -76,9 +83,64 @@ validate.checkRegData = async (req, res, next) => {
   next()
 }
 
-/*  **********************************
-*  Login Data Validation Rules
-* ********************************* */
+/* **********************************
+ *  Update Account Data Validation Rules
+ * ********************************* */
+validate.updateAccountRules = () => {
+  return [
+    // firstname is required and must be string
+    body("account_firstname")
+      .trim()
+      .escape()
+      .notEmpty()
+      .isLength({ min: 1 })
+      .withMessage("Please provide a first name."), // on error this message is sent.
+
+    // lastname is required and must be string
+    body("account_lastname")
+      .trim()
+      .escape()
+      .notEmpty()
+      .isLength({ min: 2 })
+      .withMessage("Please provide a last name."), // on error this message is sent.
+
+    // valid email is required and cannot already exist in the DB
+    body("account_email")
+    .trim()
+    .escape()
+    .notEmpty()
+    .isEmail()
+    .normalizeEmail() // refer to validator.js docs
+    .withMessage("A valid email is required.")
+    
+  ]
+}
+
+/* ******************************
+ * Check update account data and return errors or continue to account management
+ * ***************************** */
+validate.checkAccountUpdateData = async (req, res, next) => {
+  let errors = []
+  errors = validationResult(req)
+  if (!errors.isEmpty()) {
+    let nav = await utilities.getNav()
+    const accountData = res.locals.accountData
+    const accountInfoFromDatabase = await accountModel.getAccountByID(accountData.account_id)
+      
+    res.render("account/updateAccount", {
+      errors,
+      title: "Update Account for " + accountInfoFromDatabase.account_firstname,
+      nav,
+      accountData: accountInfoFromDatabase
+    })
+    return
+  }
+  next()
+}
+
+/* **********************************
+ *  Login Data Validation Rules
+ * ********************************* */
 validate.loginRules = () => {
     return [
 

@@ -39,4 +39,50 @@ async function getAccountByEmail (account_email) {
   }
 }
 
-module.exports = {registerAccount, checkExistingEmail, getAccountByEmail}
+/* *****************************
+* Return account data using account_id
+* ***************************** */
+async function getAccountByID (account_id) {
+  try {
+    const result = await pool.query(
+      'SELECT account_id, account_firstname, account_lastname, account_email, account_type, account_password FROM account WHERE account_id = $1',
+      [account_id])
+    return result.rows[0]
+  } catch (error) {
+    return new Error("No matching account id found")
+  }
+}
+
+// updatePassword function
+async function updatePassword(account_password, account_id){
+  try {
+    const sql = `UPDATE public.account SET account_password = $1 WHERE account_id = $2 RETURNING *`
+    const data = await pool.query(sql, [account_password, account_id])
+    return data.rows[0]
+  } catch (error) {
+    console.error("model error: " + error)
+    return error.message
+  }
+};
+
+// updateAccount function
+async function updateAccount(account_firstname, account_lastname, account_email, account_id){
+    const emailSql = `SELECT * FROM public.account WHERE account_email = $1 AND account_id != $2`
+    const emailCheck = await pool.query(emailSql, [account_email, account_id])
+    if (emailCheck.rows.length > 0) {
+      console.log("Error: Email already exists")
+      throw new Error("Email already exists in database - please use a different email.")
+    }
+    const sql = `UPDATE public.account SET account_firstname = $1, account_lastname = $2, account_email = $3 WHERE account_id = $4 RETURNING *`
+    const data = await pool.query(sql, [account_firstname, account_lastname, account_email, account_id])
+    return data.rows[0]
+};
+
+module.exports = {
+  registerAccount, 
+  checkExistingEmail, 
+  getAccountByEmail, 
+  getAccountByID,
+  updatePassword,
+  updateAccount
+}

@@ -5,8 +5,8 @@ const jwt = require("jsonwebtoken")
 require("dotenv").config()
 
 /* ****************************************
-*  Deliver login view
-* *************************************** */
+ *  Deliver login view
+ * *************************************** */
 async function buildLogin(req, res, next) {
   let nav = await utilities.getNav()
   res.render("account/login", {
@@ -28,9 +28,9 @@ async function buildRegister(req, res, next) {
   })
 }
 
-/* ****************************************
-*  Process Registration
-* *************************************** */
+/* ***************************************
+ *  Process Registration
+ * ************************************* */
 async function registerAccount(req, res) {
   let nav = await utilities.getNav()
   const { account_firstname, account_lastname, account_email, account_password } = req.body
@@ -75,7 +75,7 @@ async function registerAccount(req, res) {
   }
 }
 
-/* ****************************************
+/* **************************************
  *  Process login request
  * ************************************ */
 async function accountLogin(req, res) {
@@ -117,18 +117,20 @@ async function accountLogin(req, res) {
   }
 }
 
-/* ****************************************
-*  Build Account Management view
-* *************************************** */
+/* *****************************************
+ *  Build Account Management view
+ * *************************************** */
 async function buildAccountManagement(req, res, next) {
   try {
     let nav = await utilities.getNav()
-    const accountData = res.locals.accountData
+    const accountData = res.locals.accountData;
+    const accountInfoFromDatabase = await accountModel.getAccountByID(accountData.account_id)
     // Render the management page view
     res.render("account/management", {
       title: "Account Management",
       nav,
       errors: null,
+      account_firstname: accountInfoFromDatabase.account_firstname,
       accountData,
     })
   } catch (error) {
@@ -136,6 +138,124 @@ async function buildAccountManagement(req, res, next) {
     console.error("[CTRL] Error building account management view", error)
     next(error)
   }
+};
+
+/* *****************************************
+ *  Build Update Account view
+ * *************************************** */
+async function buildUpdateAccount(req, res, next) {
+  try {
+    let nav = await utilities.getNav()
+    const accountData = res.locals.accountData
+    const accountInfoFromDatabase = await accountModel.getAccountByID(accountData.account_id)
+    res.render("account/updateAccount", {
+      title: "Update Account for " + accountInfoFromDatabase.account_firstname,
+      nav,
+      errors: null,
+      accountData:accountInfoFromDatabase,
+    })
+  } catch (error) {
+    console.error("[CTRL] Error building account update view", error)
+    next(error)
+  }
+};
+
+/* *****************************************
+ *  Process update account
+ * *************************************** */
+async function updateAccount(req, res) {
+  let nav = await utilities.getNav()
+  const { account_firstname, account_lastname, account_email, type, account_id } = req.body
+
+  // if type == password, hash and store password and process with accountmodel
+  if (type == "password") {  
+    const {account_password} = req.body
+    // Hash the password before storing
+    let hashedPassword
+    try {
+      // regular password and cost (salt is generated automatically)
+      hashedPassword = await bcrypt.hashSync(account_password, 10)
+      console.log(hashedPassword)
+      const updatePassword = await accountModel.updatePassword(hashedPassword, account_id)
+      if (updatePassword) {
+        req.flash("notice", 'Password successfully changed')
+        res.status(201).render("account/management", {
+          title: "Management",
+          nav,
+          errors: null,
+          account_id,
+          account_firstname,
+          account_lastname,
+          account_email
+        })
+      } 
+    } 
+    catch (error) {
+      req.flash("notice", 'Sorry, there was an error with your password while updating your account. ' + error)
+      res.status(500).render("account/management", {
+        title: "Management",
+        nav,
+        errors: null,
+        account_firstname,
+        account_lastname,
+        account_email,
+        account_id
+      })
+    }
+  }
+  // if type == info, accountModel update account
+  else if (type == "info") {
+    try {
+      const updateResult = await accountModel.updateAccount(
+        account_firstname,
+        account_lastname,
+        account_email,
+        account_id
+      )
+      req.flash("notice", `Congratulations, you\'ve updated your account.`)
+      req.flash("notice", `First name: ${updateResult.account_firstname}`)
+      req.flash("notice", `Last name: ${updateResult.account_lastname}`)
+      req.flash("notice", `Email: ${updateResult.account_email}`)
+      res.status(201).render("account/management", {
+        title: "Management",
+        nav,
+        errors: null,
+        account_id,
+        account_firstname: updateResult.account_firstname,
+        account_lastname: updateResult.account_lastname,
+        account_email: updateResult.account_email
+      })
+    }
+    catch (error) {
+      req.flash("notice", "Sorry, the account update has failed. " + error.message)
+      res.status(501).render("account/updateAccount", {
+        title: "Update Account of " + account_firstname,
+        nav,
+        errors: null,
+        account_firstname,
+        account_lastname,
+        account_email,
+        account_id
+      })
+    }
+  }
 }
 
-module.exports = { buildLogin, buildRegister, registerAccount, accountLogin, buildAccountManagement }
+/* *****************************************
+ *  Process logout
+ * *************************************** */
+async function processLogout(req, res) {
+  res.clearCookie('jwt')
+  res.redirect('/')
+}
+
+module.exports = { 
+  buildLogin, 
+  buildRegister, 
+  registerAccount, 
+  accountLogin, 
+  buildAccountManagement,
+  buildUpdateAccount,
+  updateAccount,
+  processLogout
+}

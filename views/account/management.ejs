@@ -15,5 +15,12 @@
 <% } %>
 
 <div class="add-new-form">
-    <p>You're logged in</p>
+  <h2>Welcome <%= account_firstname %></h2>
+  <% console.log(locals.employeeOrAdmin) %>
+  <% if (locals.employeeOrAdmin) { %>
+    <h3>Access Inventory Management: <a title="Inventory Management" href="/inv/managment">Here</a></h3>
+    <h3>Update Account Information: <a title="Update account information" href="/account/updateAccount">Here</a></h3>   
+  <% } else { %>
+    <h3>Update Account Information: <a title="Update account information" href="/account/updateAccount">Here</a></h3>
+    <% } %>
 </div>
